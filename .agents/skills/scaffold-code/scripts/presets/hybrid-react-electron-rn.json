@@ -1,0 +1,60 @@
+{
+  "name": "hybrid-react-electron-rn",
+  "description": "Hybrid preset for web React, Electron desktop, and React Native mobile",
+  "defaultExt": {
+    "typescript": ".ts",
+    "tsx": ".tsx",
+    "javascript": ".js",
+    "jsx": ".jsx"
+  },
+  "defaultRuntimeByType": {
+    "hook": "shared",
+    "service": "shared",
+    "utility": "shared",
+    "type": "shared",
+    "electron-main": "desktop-main",
+    "electron-preload": "desktop-preload"
+  },
+  "targetCandidates": {
+    "screen": [
+      { "runtime": "mobile", "path": "apps/mobile/src/screens" },
+      { "runtime": "desktop-renderer", "path": "apps/desktop/renderer/src/screens" },
+      { "runtime": "web", "path": "apps/web/src/screens" }
+    ],
+    "component": [
+      { "runtime": "web", "path": "apps/web/src/components" },
+      { "runtime": "desktop-renderer", "path": "apps/desktop/renderer/src/components" },
+      { "runtime": "mobile", "path": "apps/mobile/src/components" }
+    ],
+    "hook": [
+      { "runtime": "shared", "path": "packages/shared-utils/src/hooks" },
+      { "runtime": "web", "path": "apps/web/src/hooks" },
+      { "runtime": "desktop-renderer", "path": "apps/desktop/renderer/src/hooks" },
+      { "runtime": "mobile", "path": "apps/mobile/src/hooks" }
+    ],
+    "service": [
+      { "runtime": "shared", "path": "packages/shared-api/src/services" },
+      { "runtime": "web", "path": "apps/web/src/services" },
+      { "runtime": "desktop-renderer", "path": "apps/desktop/renderer/src/services" },
+      { "runtime": "mobile", "path": "apps/mobile/src/services" }
+    ],
+    "utility": [
+      { "runtime": "shared", "path": "packages/shared-utils/src" },
+      { "runtime": "web", "path": "apps/web/src/utils" },
+      { "runtime": "desktop-renderer", "path": "apps/desktop/renderer/src/utils" },
+      { "runtime": "mobile", "path": "apps/mobile/src/utils" }
+    ],
+    "type": [
+      { "runtime": "shared", "path": "packages/shared-types/src" },
+      { "runtime": "web", "path": "apps/web/src/types" },
+      { "runtime": "desktop-renderer", "path": "apps/desktop/renderer/src/types" },
+      { "runtime": "mobile", "path": "apps/mobile/src/types" }
+    ],
+    "electron-main": [
+      { "runtime": "desktop-main", "path": "apps/desktop/main/src" }
+    ],
+    "electron-preload": [
+      { "runtime": "desktop-preload", "path": "apps/desktop/preload/src" }
+    ]
+  }
+}

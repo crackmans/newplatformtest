@@ -1,0 +1,124 @@
+{
+  "name": "hybrid-react-electron-rn",
+  "description": "Convention checks for React web, Electron desktop, React Native mobile, and shared packages",
+  "sourceRoots": [
+    "apps",
+    "packages"
+  ],
+  "allowedExtensions": [
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs"
+  ],
+  "ignoreDirs": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    ".next",
+    ".expo",
+    ".turbo",
+    "out"
+  ],
+  "naming": {
+    "style": "kebab-or-snake",
+    "allowIndex": true
+  },
+  "disallowRelativeImportPattern": "\\.\\./\\.\\./\\.\\./\\.\\./",
+  "pathHints": {
+    "screen": ["screen", "screens"],
+    "component": ["component", "components"],
+    "hook": ["hook", "hooks"],
+    "service": ["service", "services"],
+    "utility": ["util", "utils", "lib"],
+    "main": ["desktop/main"],
+    "preload": ["desktop/preload"],
+    "renderer": ["desktop/renderer"],
+    "shared": ["packages/shared"]
+  },
+  "rolePathChecks": {
+    "enabled": true,
+    "screenNameTokens": ["screen"],
+    "hookNamePrefix": "use"
+  },
+  "boundaryRules": [
+    {
+      "name": "desktop-main-isolation",
+      "appliesTo": ["apps/desktop/main"],
+      "disallowImportPatterns": [
+        "apps/desktop/renderer",
+        "desktop/renderer",
+        "renderer/",
+        "apps/web",
+        "apps/mobile",
+        "react-native"
+      ],
+      "message": "Electron main must stay isolated from renderer/web/mobile UI layers."
+    },
+    {
+      "name": "desktop-preload-isolation",
+      "appliesTo": ["apps/desktop/preload"],
+      "disallowImportPatterns": [
+        "apps/desktop/renderer",
+        "desktop/renderer",
+        "renderer/",
+        "apps/web",
+        "apps/mobile",
+        "react-native"
+      ],
+      "message": "Electron preload must remain a narrow bridge and avoid UI-layer coupling."
+    },
+    {
+      "name": "renderer-no-main-preload",
+      "appliesTo": ["apps/desktop/renderer"],
+      "disallowImportPatterns": [
+        "apps/desktop/main",
+        "desktop/main",
+        "apps/desktop/preload",
+        "desktop/preload"
+      ],
+      "message": "Desktop renderer must not import Electron main/preload source directly."
+    },
+    {
+      "name": "mobile-no-dom-react",
+      "appliesTo": ["apps/mobile"],
+      "disallowImportPatterns": [
+        "react-dom",
+        "apps/web",
+        "apps/desktop/renderer",
+        "desktop/renderer",
+        "electron"
+      ],
+      "disallowContentPatterns": [
+        "\\bdocument\\.",
+        "\\bwindow\\.",
+        "<div\\b"
+      ],
+      "message": "Mobile React Native UI must not be implemented as DOM React."
+    },
+    {
+      "name": "shared-runtime-light",
+      "appliesTo": [
+        "packages/shared-domain",
+        "packages/shared-types",
+        "packages/shared-utils",
+        "packages/shared-api",
+        "packages/shared-config",
+        "packages/shared-design-tokens",
+        "packages/shared-validation"
+      ],
+      "disallowImportPatterns": [
+        "apps/web",
+        "apps/mobile",
+        "apps/desktop/main",
+        "apps/desktop/preload",
+        "react-native",
+        "electron"
+      ],
+      "message": "Shared packages should remain platform-light and avoid platform runtime coupling."
+    }
+  ]
+}
