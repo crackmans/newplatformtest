@@ -1,0 +1,29 @@
+{
+  "name": "new-platform-test-1",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Hybrid frontend + server bootstrap baseline",
+  "workspaces": [
+    "apps/web",
+    "apps/desktop/main",
+    "apps/desktop/preload",
+    "apps/desktop/renderer",
+    "apps/mobile",
+    "packages/shared-domain",
+    "packages/shared-types",
+    "packages/shared-utils",
+    "packages/shared-api",
+    "packages/shared-config",
+    "packages/shared-design-tokens",
+    "packages/shared-validation"
+  ],
+  "scripts": {
+    "typecheck": "npm run --workspaces --if-present typecheck",
+    "lint": "npm run --workspaces --if-present lint",
+    "test": "npm run --workspaces --if-present test",
+    "build": "npm run --workspaces --if-present build",
+    "server:run": "mvn -f apps/server/pom.xml spring-boot:run",
+    "server:test": "mvn -f apps/server/pom.xml test",
+    "server:build": "mvn -f apps/server/pom.xml -DskipTests package"
+  }
+}

@@ -2,8 +2,8 @@
 
 ## Session Preflight / Baseline Context
 - Current branch: `main`
-- `git status` checked: clean before this session changes
-- Latest handoff reviewed (`work-notes/ACTIVE_HANDOFF.md`): missing at session start
+- `git status` checked: clean at session start
+- Latest handoff reviewed (`work-notes/ACTIVE_HANDOFF.md`): reviewed
 - Source-of-truth docs reviewed:
   1. `AGENTS.md`
   2. `PROJECT_BOOTSTRAP.md`
@@ -14,18 +14,19 @@
   7. `.agents/skills/verify-build/SKILL.md`
   8. `.agents/skills/verify-implementation/SKILL.md`
   9. `.agents/templates/verification-report.md`
-- Current request conflict check vs previous scope/handoff: no previous handoff artifact; no direct conflict detected.
+  10. `work-notes/*.md` current artifacts
+- Current request conflict check vs previous scope/handoff: aligned with previous deferred next step (toolchain + starter baseline)
 - In scope:
-  - bundle interpretation summary
-  - frontend+server bootstrap planning
-  - minimal boundary folder bootstrap
-  - plan/verification/handoff documentation in `work-notes/`
+  - workspace/toolchain minimal lock
+  - root script baseline
+  - minimal Spring server start skeleton
+  - work-notes update
 - Out of scope:
-  - feature implementation
-  - UI design lock
-  - auth/state/infrastructure architecture lock
-  - JPA/ORM migration or persistence restructuring
-  - cache/search/mq extension
+  - UI implementation
+  - DB connection details
+  - MyBatis mapper/XML/query authoring
+  - CI definition
+  - large-data implementation/tuning
 
 ## Task Classification (Required Before Design)
 - Screen type:
@@ -35,85 +36,84 @@
   - [x] Yes
   - [ ] No
 - DB/MyBatis impact (PostgreSQL + mapper/XML/query):
-  - [x] Yes (baseline-only, structural lock)
+  - [x] Yes (baseline dependency/scope only)
   - [ ] No
 - Non-scope items to avoid:
-  1. Forcing large-data policy globally.
-  2. Premature server module deep split.
-  3. Runtime mixing across desktop main/preload/renderer.
+  1. JPA/ORM introduction
+  2. DB datasource hard lock
+  3. full app scaffolding across all frontend targets
 
 ## Requirement Summary
-- Goal: Start the new project with minimal, boundary-safe bootstrap for frontend + server using existing bundle assets and templates.
+- Goal: establish minimal executable project baseline (workspace + server start skeleton) without entering feature or data implementation.
 
 ## Acceptance Criteria
-1. Bundle interpretation is explicitly documented with common vs conditional rules.
-2. Bootstrap plan identifies fixed-now vs still-flexible decisions.
-3. Minimal boundary folders and work-notes artifacts are created without scope expansion.
+1. Root workspace/toolchain baseline files exist and are documented.
+2. Server minimal Spring start skeleton exists and respects MyBatis baseline.
+3. Verification report clearly marks PASS/SKIP/UNVERIFIED without over-claiming runtime success.
 
 ## Boundary-Aware Impact
-- Web (`apps/web`): new empty boundary folder
-- Desktop main (`apps/desktop/main`): new empty boundary folder
-- Desktop preload (`apps/desktop/preload`): new empty boundary folder
-- Desktop renderer (`apps/desktop/renderer`): new empty boundary folder
-- Mobile (`apps/mobile`): new empty boundary folder
-- Server (Java/Spring modules): new empty `apps/server` boundary folder
-- DB/MyBatis (mapper/XML/query, PostgreSQL): baseline policy documented only; no runtime code added
-- Shared packages (`packages/shared-*`): new empty shared boundary folders
+- Web (`apps/web`): minimal workspace package manifest only
+- Desktop main (`apps/desktop/main`): minimal workspace package manifest only
+- Desktop preload (`apps/desktop/preload`): minimal workspace package manifest only
+- Desktop renderer (`apps/desktop/renderer`): minimal workspace package manifest only
+- Mobile (`apps/mobile`): minimal workspace package manifest only
+- Server (Java/Spring modules): minimal Spring Boot startup skeleton
+- DB/MyBatis (mapper/XML/query, PostgreSQL): dependency baseline only; no mapper/query implementation
+- Shared packages (`packages/shared-*`): minimal workspace package manifests only
 
 ## Protected Areas (Do Not Touch Without Approval)
-1. Unrequested architecture/toolchain lock-in.
-2. Unrequested frontend/server implementation scaffolding beyond boundary minimum.
-3. Persistence framework changes (MyBatis -> JPA/other ORM).
+1. Business API/data model design
+2. DB schema/migration/datasource lock
+3. frontend full app scaffolding
 
 ## Sharing vs Split Decisions
 - Shared-first choices (domain/types/utils/api/validation/tokens/config):
-  1. Decision: reserve shared package boundaries now.
-     - Why shared is safe: runtime-agnostic layers can be shared later without mixing platform runtimes.
+  1. Decision: keep shared package boundaries registered in workspace.
+     - Why shared is safe: prepares cross-target contracts without runtime mixing.
 - Intentional splits (runtime/rendering/API/persistence constraints):
-  1. Decision: keep `desktop/main`, `desktop/preload`, `desktop/renderer` separate from day 1.
-     - Why split is required: Electron process/runtime boundaries.
-  2. Decision: keep server boundary independent from frontend runtime code.
-     - Why split is required: Spring/MyBatis/PostgreSQL runtime and persistence concerns differ.
+  1. Decision: keep server boot code inside `apps/server` only.
+     - Why split is required: backend runtime/persistence concerns must not leak to frontend/shared runtime.
 
 ## Change Intent (NEW/MODIFY/DELETE)
 - NEW:
-  - `apps/.../.gitkeep` boundary placeholders
-  - `packages/shared-*/.gitkeep` boundary placeholders
+  - root baseline files (`package.json`, `.gitignore`, `README.md`)
+  - JS workspace `package.json` files per boundary package
+  - server baseline files (`apps/server/pom.xml`, Java entrypoint, resources)
+- MODIFY:
   - `work-notes/repo-bootstrap-plan.md`
   - `work-notes/execution-plan.md`
   - `work-notes/verification-report.md`
   - `work-notes/ACTIVE_HANDOFF.md`
-- MODIFY: none
 - DELETE: none
 
 ## Large-Data Conditional Plan (Fill Only If Applicable)
 - Applicable:
   - [ ] Yes
   - [x] No
-- Query/load strategy notes (PostgreSQL): N/A for this bootstrap step
-- MyBatis mapper/XML/query strategy notes: N/A for this bootstrap step
-- Rendering/data-transfer/memory safety notes: N/A for this bootstrap step
-- Explicitly unverified performance assumptions: Any large-data behavior is UNVERIFIED in this session.
+- Query/load strategy notes (PostgreSQL): N/A in this step
+- MyBatis mapper/XML/query strategy notes: N/A in this step
+- Rendering/data-transfer/memory safety notes: N/A in this step
+- Explicitly unverified performance assumptions: large-data behavior remains UNVERIFIED.
 
 ## Verification Plan
-- Conventions: confirm minimal path/boundary creation and no runtime boundary mixing
-- Build/type/lint/test: run only existing scripts; mark missing as SKIP
-- Server verification (if impacted): baseline-only; mark runtime checks SKIP until server scripts exist
-- DB/MyBatis query verification (if impacted): SKIP (no query implementation yet)
-- Large-data conditional verification (if applicable): not applicable this session
+- Conventions: check boundary preservation and file placement
+- Build/type/lint/test: run only scripts that now exist
+- Server verification (if impacted): run Maven build/test if command available
+- DB/MyBatis query verification (if impacted): SKIP (no query implementation)
+- Large-data conditional verification (if applicable): not applicable
 - Expected PASS conditions:
-  - requested docs/artifacts exist
-  - boundary folders exist
-  - no out-of-scope edits
+  - baseline files present
+  - scripts invocable
+  - server skeleton compiles if maven and network are available
 
 ## Risks / Blockers
-- Risk: Missing project manifests/scripts can lead to false ¡°done¡± claims.
-  - Mitigation: explicitly record SKIP/UNVERIFIED instead of PASS.
+- Risk: local environment may not have Maven/npm or may block dependency download.
+  - Mitigation: mark as SKIP/UNVERIFIED and avoid false pass claim.
 
 ## Deferred Items
-1. Item: workspace tooling and runnable scripts
-   - Deferred reason: user did not request toolchain lock-in in this step
-   - Re-entry condition: user approves next bootstrap phase for toolchain/scripts
+1. Item: frontend runtime implementation scaffolds
+   - Deferred reason: out of requested scope
+   - Re-entry condition: next feature/bootstrap phase request
 
 ## Handoff Notes
-- Suggested next step: lock minimal workspace manifests and per-target baseline scripts while preserving current boundaries.
+- Suggested next step: verify server run locally and then introduce first minimal shared API contract.

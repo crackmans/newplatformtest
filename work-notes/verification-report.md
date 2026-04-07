@@ -1,7 +1,7 @@
 # Verification Report
 
 ## Scope
-- Change set summary: Created minimal boundary folders (`apps/*`, `packages/shared-*`) and bootstrap/session documents under `work-notes/`.
+- Change set summary: Added minimal workspace/toolchain baseline (`npm workspaces`) and minimal server bootstrap skeleton (`Maven + Spring Boot + MyBatis baseline`) without feature/data implementation.
 - Verification date/time: 2026-04-07 (Asia/Seoul)
 
 ## Task Classification
@@ -21,54 +21,55 @@
 ## Run Matrix
 | Check | Command | Result | Mode (`compile-only`/`runtime-checked`/`not-run`) | Notes |
 |---|---|---|---|---|
-| conventions | manual boundary/docs check | PASS | compile-only | expected files/folders created only |
-| typecheck | N/A (script missing) | SKIP | not-run | no manifest/scripts in bootstrap-start repo |
-| lint | N/A (script missing) | SKIP | not-run | no manifest/scripts in bootstrap-start repo |
-| test | N/A (script missing) | SKIP | not-run | no manifest/scripts in bootstrap-start repo |
-| build/smoke | N/A (script missing) | SKIP | not-run | no manifest/scripts in bootstrap-start repo |
-| server verify (if impacted) | N/A (script missing) | SKIP | not-run | server boundary only; no runnable server baseline yet |
-| DB/MyBatis verify (if impacted) | N/A (implementation missing) | SKIP | not-run | policy fixed, no mapper/query implementation yet |
-| large-data conditional verify (if applicable) | N/A | SKIP | not-run | this session is not a large-data screen task |
+| conventions | manual boundary/path check | PASS | compile-only | boundaries preserved, minimal scope respected |
+| typecheck | `npm.cmd run typecheck` | PASS | compile-only | no workspace-level typecheck scripts yet (`--if-present`) |
+| lint | `npm.cmd run lint` | PASS | compile-only | no workspace-level lint scripts yet (`--if-present`) |
+| test | `npm.cmd run test` | PASS | compile-only | no workspace-level test scripts yet (`--if-present`) |
+| build/smoke | `npm.cmd run build` | PASS | compile-only | no workspace-level build scripts yet (`--if-present`) |
+| server verify (if impacted) | `npm.cmd run server:build` | FAIL | not-run | local environment missing `mvn` command |
+| DB/MyBatis verify (if impacted) | N/A | SKIP | not-run | no mapper/XML/query implementation in this scope |
+| large-data conditional verify (if applicable) | N/A | SKIP | not-run | this is not a large-data screen task |
 | architecture | manual boundary check | PASS | compile-only | desktop main/preload/renderer split preserved |
-| design-compliance | N/A for bootstrap-only | SKIP | not-run | no UI implementation in this session |
+| design-compliance | N/A | SKIP | not-run | no UI implementation in this scope |
 
 ## Findings
 | Severity | File | Issue | Recommended Fix |
 |---|---|---|---|
-| info | repository-wide | runnable verification scripts are not present yet | add minimal toolchain manifests/scripts in next bootstrap phase |
+| medium | root/server scripts | server build/run/test cannot execute without Maven | install/configure Maven (`mvn`) in local PATH before server runtime verification |
+| info | workspace packages | aggregated scripts pass because workspace scripts are intentionally not yet defined | define per-package scripts in next implementation phase when code is added |
 
 ## Boundary Validation
-- Electron main/preload/renderer boundaries: preserved as separate folders.
-- Mobile UI vs web/desktop renderer split safety: preserved (no shared UI file forced).
-- Shared package runtime-light check: preserved (empty boundaries only).
+- Electron main/preload/renderer boundaries: preserved.
+- Mobile UI vs web/desktop renderer split safety: preserved.
+- Shared package runtime-light check: preserved (manifest-only baseline).
 - Server module boundary safety (if impacted): preserved (`apps/server` isolated).
-- DB/MyBatis boundary safety (if impacted): preserved by policy; implementation UNVERIFIED.
+- DB/MyBatis boundary safety (if impacted): JPA/ORM not introduced; MyBatis baseline dependency only.
 
 ## Target Coverage
 - Web:
-  - Checked: boundary folder only
+  - Checked: workspace manifest baseline
   - Mode: compile-only
 - Desktop:
-  - Checked: boundary folders only
+  - Checked: workspace manifest baseline
   - Mode: compile-only
 - Mobile:
-  - Checked: boundary folder only
+  - Checked: workspace manifest baseline
   - Mode: compile-only
 - Server:
-  - Checked: boundary folder only
-  - Mode: compile-only
+  - Checked: source/pom baseline + build command invocation
+  - Mode: not-run
 - DB/MyBatis:
-  - Checked: policy documentation only
+  - Checked: dependency baseline only
   - Mode: not-run
 - Shared packages:
-  - Checked: boundary folders only
+  - Checked: workspace manifest baseline
   - Mode: compile-only
 
 ## Unverified Risks (Must Be Explicit)
-1. Runtime/build compatibility for each target is UNVERIFIED.
-2. Server build/run/test baseline is UNVERIFIED.
-3. MyBatis mapper/XML/query strategy execution behavior is UNVERIFIED.
+1. Server compile/run/test is UNVERIFIED until Maven is available and commands run.
+2. DB connection behavior is UNVERIFIED (datasource intentionally not fixed).
+3. MyBatis mapper/XML/query runtime behavior is UNVERIFIED (not implemented by scope).
 
 ## Final Decision
-- PASS / FAIL: PASS (for requested minimal bootstrap scope only)
-- Remaining risks: see UNVERIFIED items above.
+- PASS / FAIL: PARTIAL (baseline files applied; server runtime verification blocked by missing Maven)
+- Remaining risks: see UNVERIFIED list.
