@@ -1,7 +1,10 @@
 ﻿# PROJECT_BOOTSTRAP.md
 
 Use this checklist when the repository is new, incomplete, or still being prepared.
-The goal is to initialize a hybrid frontend workspace safely without freezing the wrong structure too early.
+The goal is to initialize a hybrid workspace safely without freezing the wrong structure too early.
+Support both:
+- frontend only
+- frontend + server (Java / Spring / PostgreSQL / MyBatis)
 
 ## 1) Project identity
 - Project name:
@@ -9,12 +12,18 @@ The goal is to initialize a hybrid frontend workspace safely without freezing th
 - Main goal:
 - Greenfield or migration?
 - Existing design/migration reference docs?
+- Project mode (required):
+  - frontend only
+  - frontend + server
 
 ## 2) Active target map (required)
 - Confirm active targets:
   - web = React
   - desktop = Electron + React renderer
   - mobile = React Native
+- Confirm whether server is an active target:
+  - server = optional
+  - if active: Java + Spring + PostgreSQL + MyBatis
 - Confirm supported operating systems per target.
 - Confirm whether desktop renderer shares UI/features with web.
 
@@ -25,6 +34,7 @@ The goal is to initialize a hybrid frontend workspace safely without freezing th
   - `apps/desktop/preload`
   - `apps/desktop/renderer`
   - `apps/mobile`
+  - `apps/server` (optional when project mode is frontend + server)
 - Confirm shared package boundaries:
   - `packages/shared-domain`
   - `packages/shared-types`
@@ -34,6 +44,10 @@ The goal is to initialize a hybrid frontend workspace safely without freezing th
   - `packages/shared-design-tokens`
   - `packages/shared-validation`
 - Confirm platform-only code locations (must not leak into shared).
+- If server is active, confirm backend boundary ownership:
+  - Spring runtime boundary
+  - MyBatis mapper/XML/query location boundary
+  - DB access boundary (PostgreSQL) and contract boundary
 
 ## 4) Sharing strategy (required)
 - Shared-first candidates:
@@ -43,6 +57,7 @@ The goal is to initialize a hybrid frontend workspace safely without freezing th
 - Explicit split candidates:
   - Electron main/preload
   - mobile RN UI when renderer/runtime/API differ
+  - server runtime and persistence concerns (Spring lifecycle, MyBatis binding, SQL behavior)
 - Record any intentional non-shared implementations and why.
 
 ## 5) UI consistency policy (required)
@@ -71,6 +86,14 @@ The goal is to initialize a hybrid frontend workspace safely without freezing th
 - Workspace tool (if monorepo):
 - TypeScript requirement:
 - React Native constraints (Expo allowed or not):
+- If server is active, record backend baseline:
+  - Java version:
+  - Spring baseline:
+  - PostgreSQL baseline:
+  - MyBatis usage scope:
+- Mark backend decisions explicitly:
+  - Fixed now:
+  - Still flexible:
 
 ## 8) Verification baseline
 List only commands that truly exist or are explicitly approved to add.
@@ -81,6 +104,11 @@ List only commands that truly exist or are explicitly approved to add.
 - lint:
 - test:
 - build/smoke (by target):
+- server install/run/build/test baseline (optional):
+  - install:
+  - run:
+  - test:
+  - build:
 
 Also define what cannot be claimed without runtime execution.
 
@@ -94,10 +122,10 @@ Also define what cannot be claimed without runtime execution.
 - If permission or user-side action is required, request it explicitly from the user and do not use bypass workarounds.
 
 ## 10) First-session deliverables
-1. Current boundary summary (web/desktop/mobile/shared)
+1. Current boundary summary (frontend targets + optional server + shared)
 2. Draft execution plan with explicit in/out scope
 3. Minimal bootstrap changes only
-4. Verification command summary (PASS/FAIL/SKIP)
+4. Verification command summary (PASS/FAIL/SKIP, including server baseline when active)
 5. Session handoff artifact under `work-notes/`
 
 ## 11) Flexible vs fixed decisions
@@ -110,6 +138,8 @@ Mark explicitly:
   - exact feature folder layout
   - selected test/lint tooling details
   - CI shape
+  - server package/module split details (if server active)
+  - MyBatis mapper structure depth beyond current required scope
 
 ## 12) Ready-to-lock later
 Finalize after implementation starts proving the structure:

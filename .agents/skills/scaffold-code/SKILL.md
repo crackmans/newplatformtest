@@ -8,6 +8,8 @@ description: Generate hybrid scaffold files across web, desktop (Electron), mobi
 ## Purpose
 - Create boundary-safe scaffold files for a hybrid frontend bundle.
 - Keep shared-first logic while avoiding forced cross-runtime UI coupling.
+- Keep scope explicit: this skill scaffolds frontend/Electron/shared code only.
+- Server scaffolding (Java/Spring/PostgreSQL/MyBatis) is out of scope in this skill.
 
 ## Active Script
 - `node .agents/skills/scaffold-code/scripts/scaffold.mjs --type=<screen|component|hook|service|utility|type|electron-main|electron-preload> --name=<Name>`
@@ -38,3 +40,5 @@ description: Generate hybrid scaffold files across web, desktop (Electron), mobi
 - Active preset is hybrid and runtime-aware.
 - TypeScript output is auto-detected via `tsconfig.json` unless overridden.
 - Keep platform-only libraries in platform-only app boundaries.
+- If project mode is `frontend + server`, use this skill only for frontend/Electron/shared areas.
+- Do not interpret this skill as a backend code generator.
