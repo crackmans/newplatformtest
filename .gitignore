@@ -3,6 +3,7 @@ node_modules/
 
 # Java/Maven
 **/target/
+apps/server/.mvn/repository/
 
 # OS/IDE
 .DS_Store

@@ -22,8 +22,8 @@
     "lint": "npm run --workspaces --if-present lint",
     "test": "npm run --workspaces --if-present test",
     "build": "npm run --workspaces --if-present build",
-    "server:run": "mvn -f apps/server/pom.xml spring-boot:run",
-    "server:test": "mvn -f apps/server/pom.xml test",
-    "server:build": "mvn -f apps/server/pom.xml -DskipTests package"
+    "server:run": "cd apps/server && mvnw.cmd -Dmaven.repo.local=.mvn/repository spring-boot:run",
+    "server:test": "cd apps/server && mvnw.cmd -Dmaven.repo.local=.mvn/repository test",
+    "server:build": "cd apps/server && mvnw.cmd -Dmaven.repo.local=.mvn/repository -DskipTests package"
   }
 }

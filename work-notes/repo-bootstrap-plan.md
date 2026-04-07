@@ -1,14 +1,12 @@
 # Repo Bootstrap Plan (Hybrid Bundle)
 
 ## Context
-- Request summary: Proceed bootstrap next step with minimum fixed decisions for workspace/toolchain/minimal execution skeleton for frontend + server.
+- Request summary: Add only DB profile placeholder boundary on top of current server baseline; no real DB connection, mapper/query, or business API.
 - Project mode:
   - frontend + server
 - Source references reviewed:
   - `AGENTS.md`
   - `PROJECT_BOOTSTRAP.md`
-  - `.agents/skills/bootstrap-repo/SKILL.md`
-  - `.agents/templates/repo-bootstrap-plan.md`
   - `.agents/skills/plan-task/SKILL.md`
   - `.agents/templates/execution-plan.md`
   - `.agents/skills/verify-build/SKILL.md`
@@ -26,59 +24,39 @@
 - server = Java / Spring / PostgreSQL / MyBatis (active)
 
 ## Boundary Snapshot
-- Web app root: `apps/web`
-- Desktop main root: `apps/desktop/main`
-- Desktop preload root: `apps/desktop/preload`
-- Desktop renderer root: `apps/desktop/renderer`
-- Mobile root: `apps/mobile`
-- Server root (optional): `apps/server` (active)
-- Server persistence boundary (optional, MyBatis/XML/query): inside `apps/server` (detail structure still flexible)
-- Shared package roots:
-  - domain: `packages/shared-domain`
-  - types: `packages/shared-types`
-  - utils: `packages/shared-utils`
-  - api: `packages/shared-api`
-  - config: `packages/shared-config`
-  - design tokens: `packages/shared-design-tokens`
-  - validation: `packages/shared-validation`
+- Server root: `apps/server`
+- Profile boundary files:
+  - `application.yml` (default profile)
+  - `application-no-db.yml` (no-db runnable baseline)
+  - `application-db-placeholder.yml` (DB placeholder boundary)
 
 ## Fixed Decisions
-1. JS package manager/workspace is fixed to `npm workspaces`.
-2. Server build baseline is fixed to `Maven + Spring Boot`.
-3. Root execution baseline scripts are fixed: `typecheck/lint/test/build` aggregator and `server:run/server:test/server:build`.
-4. Backend baseline remains fixed to Java/Spring/PostgreSQL/MyBatis (no JPA/ORM migration).
+1. `apps/server/.mvn/repository` is excluded from Git.
+2. Default server profile is `no-db` for bootstrap runtime stability.
+3. `db-placeholder` profile file exists for DB boundary, but contains placeholders only.
+4. Wrapper and `.mvn/wrapper` stay committed for reproducible build tooling.
 
 ## Flexible Decisions (Not Locked Yet)
-1. Frontend framework internals (routing/state/UI library choices).
-2. CI workflow and release pipeline shape.
-3. Server module split depth and package conventions.
-4. DB connection details/profiles and MyBatis mapper/XML/query structure depth.
+1. Real datasource URL/credentials and profile activation policy.
+2. MyBatis mapper/XML/query structure and first implementation scope.
+3. Real DB 연결 검증 순서.
+4. DB-specific CI settings.
 
 ## Bootstrap Actions (Minimal)
-1. Add root `package.json` with npm workspace and baseline scripts.
-2. Add minimal package manifests to existing JS workspace boundaries.
-3. Add minimal `apps/server` Spring Boot startup skeleton (`pom.xml`, main class, health endpoint, `application.yml`).
-4. Add minimal root `.gitignore` and `README.md` run guide.
+1. Keep `.gitignore` excluding `apps/server/.mvn/repository`.
+2. Split no-db runtime and db-placeholder profile boundary into separate files.
+3. Re-verify build/test and no-db health runtime.
+4. Update work-notes only.
 
 ## Verification Baseline
-- install: `npm install` (not run in this session)
-- dev/run (by active target): server baseline command added (`npm run server:run`)
-- typecheck: `npm run typecheck`
-- lint: `npm run lint`
-- test: `npm run test`
-- build/smoke: `npm run build`
-- server verification baseline (optional):
-  - install: Maven dependency resolution via `mvn`
-  - run: `npm run server:run`
-  - test: `npm run server:test`
-  - build: `npm run server:build`
-- SKIP reasons (if any): runtime verification depends on local npm/maven availability and dependency/network access.
+- server build: `npm.cmd run server:build` PASS
+- server test: `npm.cmd run server:test` PASS
+- no-db health check: `java -jar ...` + `GET /api/health` PASS
+- db-placeholder runtime: not executed by scope
 
 ## Risks and Mitigations
-- frontend-only risk:
-  - mitigation: keep only workspace baseline, no UI implementation lock.
-- frontend+server risk (if active):
-  - mitigation: keep Spring/MyBatis baseline minimal and avoid DB/mapper premature fixation.
+- risk: placeholder profile accidentally used as real config.
+  - mitigation: explicit placeholder tokens (`<DB_HOST>`, etc.) and no activation in default profile.
 
 ## Next Step
-- Immediate follow-up task: Add first minimal shared contract package usage and one server-side package split decision backed by runnable verification.
+- Immediate follow-up task: add datasource/profile validation rule (format-level only) without enabling actual DB connection.

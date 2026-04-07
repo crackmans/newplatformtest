@@ -1,6 +1,8 @@
 spring:
   application:
     name: new-platform-server
+  profiles:
+    default: no-db
 
 server:
   port: 8080

@@ -1,7 +1,7 @@
 # Verification Report
 
 ## Scope
-- Change set summary: Added minimal workspace/toolchain baseline (`npm workspaces`) and minimal server bootstrap skeleton (`Maven + Spring Boot + MyBatis baseline`) without feature/data implementation.
+- Change set summary: Added DB profile placeholder boundary files and kept default no-db runtime path unchanged.
 - Verification date/time: 2026-04-07 (Asia/Seoul)
 
 ## Task Classification
@@ -21,55 +21,46 @@
 ## Run Matrix
 | Check | Command | Result | Mode (`compile-only`/`runtime-checked`/`not-run`) | Notes |
 |---|---|---|---|---|
-| conventions | manual boundary/path check | PASS | compile-only | boundaries preserved, minimal scope respected |
-| typecheck | `npm.cmd run typecheck` | PASS | compile-only | no workspace-level typecheck scripts yet (`--if-present`) |
-| lint | `npm.cmd run lint` | PASS | compile-only | no workspace-level lint scripts yet (`--if-present`) |
-| test | `npm.cmd run test` | PASS | compile-only | no workspace-level test scripts yet (`--if-present`) |
-| build/smoke | `npm.cmd run build` | PASS | compile-only | no workspace-level build scripts yet (`--if-present`) |
-| server verify (if impacted) | `npm.cmd run server:build` | FAIL | not-run | local environment missing `mvn` command |
-| DB/MyBatis verify (if impacted) | N/A | SKIP | not-run | no mapper/XML/query implementation in this scope |
-| large-data conditional verify (if applicable) | N/A | SKIP | not-run | this is not a large-data screen task |
-| architecture | manual boundary check | PASS | compile-only | desktop main/preload/renderer split preserved |
-| design-compliance | N/A | SKIP | not-run | no UI implementation in this scope |
+| conventions | manual profile-boundary review | PASS | compile-only | no real credentials, no mapper/query added |
+| typecheck | not run in this step | SKIP | not-run | no TS/JS code changes in this step |
+| lint | not run in this step | SKIP | not-run | no TS/JS code changes in this step |
+| test | `npm.cmd run server:test` | PASS | compile-only | no tests to run |
+| build/smoke | `npm.cmd run server:build` | PASS | compile-only | wrapper + repo-local cache path works |
+| server verify (if impacted) | `java -jar apps/server/target/server-0.0.1-SNAPSHOT.jar` | PASS | runtime-checked | app starts under default no-db profile |
+| DB/MyBatis verify (if impacted) | N/A | SKIP | not-run | no DB connection / mapper runtime by scope |
+| large-data conditional verify (if applicable) | N/A | SKIP | not-run | not applicable |
+| architecture | manual boundary check | PASS | compile-only | server config-only change |
+| design-compliance | N/A | SKIP | not-run | no UI changes |
+| health check | `GET http://127.0.0.1:8080/api/health` | PASS | runtime-checked | `200 ok` |
 
 ## Findings
 | Severity | File | Issue | Recommended Fix |
 |---|---|---|---|
-| medium | root/server scripts | server build/run/test cannot execute without Maven | install/configure Maven (`mvn`) in local PATH before server runtime verification |
-| info | workspace packages | aggregated scripts pass because workspace scripts are intentionally not yet defined | define per-package scripts in next implementation phase when code is added |
+| info | `application-db-placeholder.yml` | placeholder profile is intentionally non-runnable as real DB config | keep placeholder-only until explicit DB baseline step |
 
 ## Boundary Validation
-- Electron main/preload/renderer boundaries: preserved.
-- Mobile UI vs web/desktop renderer split safety: preserved.
-- Shared package runtime-light check: preserved (manifest-only baseline).
-- Server module boundary safety (if impacted): preserved (`apps/server` isolated).
-- DB/MyBatis boundary safety (if impacted): JPA/ORM not introduced; MyBatis baseline dependency only.
+- Electron main/preload/renderer boundaries: unchanged.
+- Mobile UI vs web/desktop renderer split safety: unchanged.
+- Shared package runtime-light check: unchanged.
+- Server module boundary safety (if impacted): preserved.
+- DB/MyBatis boundary safety (if impacted): no JPA/ORM, no mapper/query implementation.
 
 ## Target Coverage
-- Web:
-  - Checked: workspace manifest baseline
-  - Mode: compile-only
-- Desktop:
-  - Checked: workspace manifest baseline
-  - Mode: compile-only
-- Mobile:
-  - Checked: workspace manifest baseline
-  - Mode: compile-only
+- Web/Desktop/Mobile/Shared:
+  - Checked: not run in this step
+  - Mode: not-run
 - Server:
-  - Checked: source/pom baseline + build command invocation
-  - Mode: not-run
+  - Checked: build/test/startup/health
+  - Mode: runtime-checked
 - DB/MyBatis:
-  - Checked: dependency baseline only
+  - Checked: config boundary only
   - Mode: not-run
-- Shared packages:
-  - Checked: workspace manifest baseline
-  - Mode: compile-only
 
 ## Unverified Risks (Must Be Explicit)
-1. Server compile/run/test is UNVERIFIED until Maven is available and commands run.
-2. DB connection behavior is UNVERIFIED (datasource intentionally not fixed).
-3. MyBatis mapper/XML/query runtime behavior is UNVERIFIED (not implemented by scope).
+1. `db-placeholder` profile with real DB values was not executed (UNVERIFIED by scope).
+2. Actual PostgreSQL connectivity is UNVERIFIED.
+3. MyBatis mapper/XML/query runtime is UNVERIFIED.
 
 ## Final Decision
-- PASS / FAIL: PARTIAL (baseline files applied; server runtime verification blocked by missing Maven)
+- PASS / FAIL: PASS (scoped placeholder-boundary step)
 - Remaining risks: see UNVERIFIED list.

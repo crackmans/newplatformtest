@@ -2,31 +2,27 @@
 
 ## Session Preflight / Baseline Context
 - Current branch: `main`
-- `git status` checked: clean at session start
+- `git status` checked: dirty from prior approved baseline changes
 - Latest handoff reviewed (`work-notes/ACTIVE_HANDOFF.md`): reviewed
 - Source-of-truth docs reviewed:
   1. `AGENTS.md`
   2. `PROJECT_BOOTSTRAP.md`
-  3. `.agents/skills/bootstrap-repo/SKILL.md`
-  4. `.agents/templates/repo-bootstrap-plan.md`
-  5. `.agents/skills/plan-task/SKILL.md`
-  6. `.agents/templates/execution-plan.md`
-  7. `.agents/skills/verify-build/SKILL.md`
-  8. `.agents/skills/verify-implementation/SKILL.md`
-  9. `.agents/templates/verification-report.md`
-  10. `work-notes/*.md` current artifacts
-- Current request conflict check vs previous scope/handoff: aligned with previous deferred next step (toolchain + starter baseline)
+  3. `.agents/skills/plan-task/SKILL.md`
+  4. `.agents/templates/execution-plan.md`
+  5. `.agents/skills/verify-build/SKILL.md`
+  6. `.agents/skills/verify-implementation/SKILL.md`
+  7. `.agents/templates/verification-report.md`
+  8. `work-notes/*.md`
+- Current request conflict check vs previous scope/handoff: aligned (next step approved: DB profile placeholder boundary only)
 - In scope:
-  - workspace/toolchain minimal lock
-  - root script baseline
-  - minimal Spring server start skeleton
-  - work-notes update
+  - profile boundary files for no-db/db-placeholder
+  - execution baseline clarification
+  - work-notes updates
 - Out of scope:
-  - UI implementation
-  - DB connection details
-  - MyBatis mapper/XML/query authoring
-  - CI definition
-  - large-data implementation/tuning
+  - real DB connection
+  - mapper/XML/query
+  - business API
+  - frontend expansion
 
 ## Task Classification (Required Before Design)
 - Screen type:
@@ -36,50 +32,44 @@
   - [x] Yes
   - [ ] No
 - DB/MyBatis impact (PostgreSQL + mapper/XML/query):
-  - [x] Yes (baseline dependency/scope only)
+  - [x] Yes (profile boundary only)
   - [ ] No
 - Non-scope items to avoid:
-  1. JPA/ORM introduction
-  2. DB datasource hard lock
-  3. full app scaffolding across all frontend targets
+  1. datasource actual credentials
+  2. DB connection attempts from placeholder profile
+  3. mapper/query code generation
 
 ## Requirement Summary
-- Goal: establish minimal executable project baseline (workspace + server start skeleton) without entering feature or data implementation.
+- Goal: add profile boundary placeholders safely while keeping default no-db runtime stable.
 
 ## Acceptance Criteria
-1. Root workspace/toolchain baseline files exist and are documented.
-2. Server minimal Spring start skeleton exists and respects MyBatis baseline.
-3. Verification report clearly marks PASS/SKIP/UNVERIFIED without over-claiming runtime success.
+1. Default no-db run remains successful.
+2. db-placeholder profile file exists with placeholder-only keys.
+3. No actual DB connection or mapper/query implementation is introduced.
 
 ## Boundary-Aware Impact
-- Web (`apps/web`): minimal workspace package manifest only
-- Desktop main (`apps/desktop/main`): minimal workspace package manifest only
-- Desktop preload (`apps/desktop/preload`): minimal workspace package manifest only
-- Desktop renderer (`apps/desktop/renderer`): minimal workspace package manifest only
-- Mobile (`apps/mobile`): minimal workspace package manifest only
-- Server (Java/Spring modules): minimal Spring Boot startup skeleton
-- DB/MyBatis (mapper/XML/query, PostgreSQL): dependency baseline only; no mapper/query implementation
-- Shared packages (`packages/shared-*`): minimal workspace package manifests only
+- Server (`apps/server`): profile resource files only.
+- Other boundaries: unchanged.
 
 ## Protected Areas (Do Not Touch Without Approval)
-1. Business API/data model design
-2. DB schema/migration/datasource lock
-3. frontend full app scaffolding
+1. real datasource values
+2. mapper/XML/query implementation
+3. business API layer
 
 ## Sharing vs Split Decisions
-- Shared-first choices (domain/types/utils/api/validation/tokens/config):
-  1. Decision: keep shared package boundaries registered in workspace.
-     - Why shared is safe: prepares cross-target contracts without runtime mixing.
-- Intentional splits (runtime/rendering/API/persistence constraints):
-  1. Decision: keep server boot code inside `apps/server` only.
-     - Why split is required: backend runtime/persistence concerns must not leak to frontend/shared runtime.
+- Shared-first choices:
+  1. none in this step
+     - Why shared is safe: deferred by scope
+- Intentional splits:
+  1. DB placeholder remains server-local config boundary.
+     - Why split is required: runtime configuration concern for backend only.
 
 ## Change Intent (NEW/MODIFY/DELETE)
 - NEW:
-  - root baseline files (`package.json`, `.gitignore`, `README.md`)
-  - JS workspace `package.json` files per boundary package
-  - server baseline files (`apps/server/pom.xml`, Java entrypoint, resources)
+  - `apps/server/src/main/resources/application-no-db.yml`
+  - `apps/server/src/main/resources/application-db-placeholder.yml`
 - MODIFY:
+  - `apps/server/src/main/resources/application.yml`
   - `work-notes/repo-bootstrap-plan.md`
   - `work-notes/execution-plan.md`
   - `work-notes/verification-report.md`
@@ -90,30 +80,29 @@
 - Applicable:
   - [ ] Yes
   - [x] No
-- Query/load strategy notes (PostgreSQL): N/A in this step
-- MyBatis mapper/XML/query strategy notes: N/A in this step
-- Rendering/data-transfer/memory safety notes: N/A in this step
+- Query/load strategy notes (PostgreSQL): N/A
+- MyBatis mapper/XML/query strategy notes: N/A
+- Rendering/data-transfer/memory safety notes: N/A
 - Explicitly unverified performance assumptions: large-data behavior remains UNVERIFIED.
 
 ## Verification Plan
-- Conventions: check boundary preservation and file placement
-- Build/type/lint/test: run only scripts that now exist
-- Server verification (if impacted): run Maven build/test if command available
-- DB/MyBatis query verification (if impacted): SKIP (no query implementation)
-- Large-data conditional verification (if applicable): not applicable
+- Conventions: ensure placeholder profile contains no real secrets
+- Build/type/lint/test: run existing relevant commands
+- Server verification: build/test + no-db health
+- DB/MyBatis query verification: SKIP
+- Large-data conditional verification: N/A
 - Expected PASS conditions:
-  - baseline files present
-  - scripts invocable
-  - server skeleton compiles if maven and network are available
+  - no-db startup and health pass
+  - placeholder profile file present and non-operative by default
 
 ## Risks / Blockers
-- Risk: local environment may not have Maven/npm or may block dependency download.
-  - Mitigation: mark as SKIP/UNVERIFIED and avoid false pass claim.
+- Risk: accidental activation of placeholder profile by users.
+  - Mitigation: keep `spring.profiles.default=no-db` and placeholders explicit.
 
 ## Deferred Items
-1. Item: frontend runtime implementation scaffolds
-   - Deferred reason: out of requested scope
-   - Re-entry condition: next feature/bootstrap phase request
+1. Item: real DB profile activation and validation
+   - Deferred reason: out of scope
+   - Re-entry condition: explicit user request for DB baseline step
 
 ## Handoff Notes
-- Suggested next step: verify server run locally and then introduce first minimal shared API contract.
+- Suggested next step: define DB profile validation checklist (no runtime connection yet).
